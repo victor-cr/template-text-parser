@@ -13,7 +13,7 @@ public enum EolToken implements Token {
     LFCR("\n\r"),
     CR("\r"),
     LF("\n"),
-    SYSTEM(System.getProperty("line.terminator"));
+    SYSTEM(System.getProperty("line.separator"));
 
     private final String terminator;
 

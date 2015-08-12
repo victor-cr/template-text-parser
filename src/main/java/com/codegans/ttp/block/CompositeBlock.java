@@ -1,6 +1,6 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.CharStream;
+import com.codegans.ttp.LineStream;
 import com.codegans.ttp.error.PrematureEndParserException;
 import com.codegans.ttp.Block;
 
@@ -24,11 +24,11 @@ public class CompositeBlock implements Block {
     }
 
     @Override
-    public long apply(CharStream text) {
-        boolean premature = blocks.stream().mapToLong(b -> b.apply(text)).anyMatch(l -> l == -1);
+    public int apply(LineStream lines, int offset) {
+        boolean premature = blocks.stream().mapToLong(b -> b.apply(lines, 0)).anyMatch(l -> l == -1);
 
         if (premature) {
-            throw new PrematureEndParserException(text);
+            throw new PrematureEndParserException(lines.getCurrentLineIndex(), offset);
         }
 
         return 0;

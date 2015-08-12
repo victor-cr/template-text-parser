@@ -1,7 +1,11 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.Block;
+import com.codegans.ttp.TestUtil;
+import com.codegans.ttp.error.ParserException;
 import org.junit.Test;
+
+import static com.codegans.ttp.TestUtil.simple;
+import static org.junit.Assert.assertEquals;
 
 /**
  * JavaDoc here
@@ -13,7 +17,7 @@ public class SimpleBlockTest {
 
     @Test(expected = NullPointerException.class)
     public void testApply_ContentNull() {
-        new SimpleBlock(null);
+        simple(null);
     }
 
     @Test(expected = NullPointerException.class)
@@ -23,8 +27,44 @@ public class SimpleBlockTest {
 
     @Test
     public void testApply_Empty() {
-        Block block = new SimpleBlock("");
+        int pos = simple("").apply(TestUtil.string("test"), 0);
 
-        block.apply("test");
+        assertEquals(0, pos);
+    }
+
+    @Test
+    public void testApply_ExpectedText() {
+        int pos = simple("Expected text").apply(TestUtil.string("Expected text and something more"), 0);
+
+        assertEquals(13, pos);
+    }
+
+    @Test(expected = ParserException.class)
+    public void testApply_ExpectedText_Negative() {
+        simple("Expected text").apply(TestUtil.string("Expected test and something more"), 0);
+    }
+
+    @Test
+    public void testApply_ExpectedTextOffset() {
+        int pos = simple("Expected text").apply(TestUtil.string("123Expected text and something more"), 3);
+
+        assertEquals(16, pos);
+    }
+
+    @Test(expected = ParserException.class)
+    public void testApply_ExpectedTextOffset_Negative() {
+        simple("Expected text").apply(TestUtil.string("123Expected text and something more"), 2);
+    }
+
+    @Test
+    public void testApply_ExpectedTextMultiline() {
+        int pos = simple("Expected text").apply(TestUtil.string("123\nExpected text and something more", 2), 0);
+
+        assertEquals(13, pos);
+    }
+
+    @Test(expected = ParserException.class)
+    public void testApply_ExpectedTextMultiline_Negative() {
+        simple("Expected text").apply(TestUtil.string("123\nExpected text and something more", 1), 0);
     }
 }

@@ -1,7 +1,5 @@
 package com.codegans.ttp.error;
 
-import com.codegans.ttp.CharStream;
-
 /**
  * JavaDoc here
  *
@@ -11,10 +9,6 @@ import com.codegans.ttp.CharStream;
 public class PrematureEndParserException extends ParserException {
     private final long line;
     private final long column;
-
-    public PrematureEndParserException(CharStream content) {
-        this(content.line(), content.column());
-    }
 
     public PrematureEndParserException(long line, long column) {
         super("Premature end of the input at " + line + ":" + column);

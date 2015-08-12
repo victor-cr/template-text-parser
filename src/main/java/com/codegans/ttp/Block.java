@@ -7,5 +7,5 @@ package com.codegans.ttp;
  * @since 25.07.2015 19:09
  */
 public interface Block {
-    long apply(CharStream text);
+    int apply(LineStream lines, int offset);
 }

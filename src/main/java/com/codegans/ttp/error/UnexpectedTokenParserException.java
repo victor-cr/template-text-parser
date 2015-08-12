@@ -1,7 +1,5 @@
 package com.codegans.ttp.error;
 
-import com.codegans.ttp.CharStream;
-
 /**
  * JavaDoc here
  *
@@ -11,10 +9,6 @@ import com.codegans.ttp.CharStream;
 public class UnexpectedTokenParserException extends ParserException {
     private final long line;
     private final long column;
-
-    public UnexpectedTokenParserException(CharStream content) {
-        this(content.line(), content.column());
-    }
 
     public UnexpectedTokenParserException(long line, long column) {
         super("Unexpected token at " + line + ":" + column);

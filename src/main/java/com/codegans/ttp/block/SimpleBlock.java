@@ -1,6 +1,6 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.CharStream;
+import com.codegans.ttp.LineStream;
 import com.codegans.ttp.EventBus;
 import com.codegans.ttp.error.PrematureEndParserException;
 import com.codegans.ttp.error.UnexpectedTokenParserException;
@@ -16,15 +16,15 @@ import java.util.Objects;
  * @since 28.07.2015 22:12
  */
 public class SimpleBlock extends AbstractBlock {
-    private final CharSequence content;
+    private final String content;
 
-    public SimpleBlock(CharSequence content) {
+    public SimpleBlock(String content) {
         Objects.requireNonNull(content, "Content must be defined");
 
         this.content = content;
     }
 
-    public SimpleBlock(CharSequence content, EventBus eventBus) {
+    public SimpleBlock(String content, EventBus eventBus) {
         super(eventBus);
 
         Objects.requireNonNull(content, "Content must be defined");
@@ -33,22 +33,27 @@ public class SimpleBlock extends AbstractBlock {
     }
 
     @Override
-    public long apply(CharStream text) {
-        long line = text.line();
-        long col = text.column();
-        int len = content.length();
+    public int apply(LineStream lines, int offset) {
+        int len = content.length() + offset;
 
-        CharSequence value = text.next(len);
+        CharSequence value = lines.currentLine();
 
-        if (value.length() < len) {
-            publish(new ErrorEvent(new PrematureEndParserException(text)));
+        if (offset < 0 || value.length() < len) {
+            publish(new ErrorEvent(new PrematureEndParserException(lines.getCurrentLineIndex(), len)));
         }
 
-        if (content.equals(value)) {
-            publish(new TextEvent(content));
-        } else {
-            publish(new ErrorEvent(new UnexpectedTokenParserException(line, col)));
+        int i = offset;
+        int j = content.length();
+        int k = 0;
+
+        while (--j >= 0) {
+            if (value.charAt(i++) != content.charAt(k++)) {
+                publish(new ErrorEvent(new UnexpectedTokenParserException(lines.getCurrentLineIndex(), i)));
+                return i;
+            }
         }
+
+        publish(new TextEvent(content));
 
         return len;
     }
