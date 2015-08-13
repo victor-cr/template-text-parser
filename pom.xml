@@ -2,16 +2,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.codegans.text</groupId>
-    <artifactId>text-parser</artifactId>
-    <packaging>jar</packaging>
-    <version>0.0</version>
+    <artifactId>ttp-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1-SNAPSHOT</version>
 
-    <name>Parsing text</name>
+    <name>Template text parser</name>
 
-    <!--<scm>-->
-    <!--<connection>scm:git:git://github.com/victor-cr/jeeconfua-web-examples</connection>-->
-    <!--<url>http://github.com/victor-cr/jeeconfua-web-examples</url>-->
-    <!--</scm>-->
+    <modules>
+        <module>ttp-core</module>
+        <module>ttp-java-dsl</module>
+    </modules>
+    <scm>
+        <connection>scm:git:git://github.com/victor-cr/template-text-parser</connection>
+        <url>http://github.com/victor-cr/template-text-parser</url>
+    </scm>
 
     <properties>
         <jdk.version>1.8</jdk.version>
@@ -25,14 +29,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${org.slf4j.version}</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
