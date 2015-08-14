@@ -1,12 +1,14 @@
 package com.codegans.ttp.stream;
 
 import com.codegans.ttp.LineStream;
+import com.codegans.ttp.Terminator;
 import com.codegans.ttp.misc.EncodedLazyCharSequence;
 import com.codegans.ttp.misc.StringUtil;
-import com.codegans.ttp.Terminator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -79,6 +81,24 @@ public abstract class AbstractLineStream implements LineStream {
     protected abstract CharSequence internalNextLine();
 
     protected int indexOfEol(CharSequence content, int offset) {
-        return StringUtil.indexOfAny(content, offset, terminators.stream().map(Terminator::chars).collect(Collectors.toList()));
+        Collection<char[]> terminators = this.terminators.stream().map(Terminator::chars).collect(Collectors.toList());
+
+        int i = offset;
+        int len = content.length();
+        int[] firsts = terminators.stream().filter(e -> e.length != 0).mapToInt(e -> e[0]).distinct().sorted().toArray();
+
+        while (i < len) {
+            while (Arrays.binarySearch(firsts, content.charAt(i)) <= StringUtil.NOT_FOUND && ++i < len) ;
+
+            int j = StringUtil.startsWithLongest(content, i, terminators);
+
+            if (j != StringUtil.NOT_FOUND) {
+                return j;
+            }
+
+            i++;
+        }
+
+        return StringUtil.NOT_FOUND;
     }
 }

@@ -15,77 +15,70 @@ public final class StringUtil {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Stolen from {@code org.apache.commons.lang3.StringUtils#indexOfAny(CharSequence, CharSequence...) }
-     */
-    public static int indexOfAny(CharSequence str, int offset, Collection<char[]> searchChars) {
+    public static int startsWithLongest(CharSequence str, int offset, Collection<char[]> searchChars) {
         if (str == null || searchChars == null || str.length() == 0 || searchChars.isEmpty()) {
             return NOT_FOUND;
         }
 
-        int begin = Integer.MAX_VALUE;
-        int count = Integer.MIN_VALUE;
-        int tmp, len = str.length();
+        int end = Integer.MIN_VALUE;
+        int tmp;
 
         for (char[] search : searchChars) {
             if (search == null) {
                 continue;
             }
 
-            tmp = indexOf(str, 0, len, search, 0, search.length, offset);
+            tmp = startsWith(str, offset, search);
 
             if (tmp == NOT_FOUND) {
                 continue;
             }
 
-            if (tmp < begin) {
-                begin = tmp;
-                count = search.length;
-            } else if (tmp == begin && count < search.length) {
-                count = search.length;
+            if (tmp > end) {
+                end = tmp;
             }
         }
 
-        return begin == Integer.MAX_VALUE ? NOT_FOUND : begin + count;
+        return end == Integer.MIN_VALUE ? NOT_FOUND : end;
     }
 
-    /**
-     * Stolen from {@code java.lang.String#indexOf(char[], int, int, char[], int, int, int)}
-     */
-    @SuppressWarnings("all")
-    public static int indexOf(CharSequence source, int sourceOffset, int sourceCount,
-                               char[] target, int targetOffset, int targetCount,
-                               int fromIndex) {
-        if (fromIndex >= sourceCount) {
-            return targetCount == 0 ? sourceCount : NOT_FOUND;
+    public static int startsWith(CharSequence source, int offset, char[] target) {
+        int len = target.length;
+        int i = offset;
+        int j = 0;
+
+        if (offset < 0 || (offset + len > source.length())) {
+            return NOT_FOUND;
         }
 
-        if (fromIndex < 0) {
-            fromIndex = 0;
-        }
-
-        if (targetCount == 0) {
-            return fromIndex;
-        }
-
-        char first = target[targetOffset];
-        int max = sourceOffset + sourceCount - targetCount;
-
-        for (int i = sourceOffset + fromIndex; i <= max; i++) {
-            while (source.charAt(i) != first && ++i <= max) ;
-
-            if (i <= max) {
-                int j = i + 1;
-                int end = j + targetCount - 1;
-                for (int k = targetOffset + 1; j < end && source.charAt(j) == target[k]; j++, k++) ;
-
-                if (j == end) {
-                    return i - sourceOffset;
-                }
+        while (--len >= 0) {
+            if (source.charAt(i++) != target[j++]) {
+                return NOT_FOUND;
             }
         }
 
-        return NOT_FOUND;
+        return i;
     }
 
+    public static String encodeSpecial(CharSequence content) {
+        StringBuilder result = new StringBuilder(content.length() * 2);
+
+        content.chars().forEach(ch -> {
+            switch (ch) {
+                case '\r':
+                    result.append("\\r");
+                    break;
+                case '\n':
+                    result.append("\\n");
+                    break;
+                case '\t':
+                    result.append("\\t");
+                    break;
+                default:
+                    result.append((char) ch);
+            }
+        });
+
+        return result.toString();
+    }
 }

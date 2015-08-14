@@ -1,6 +1,7 @@
 package com.codegans.ttp.block;
 
 import com.codegans.ttp.TestUtil;
+import com.codegans.ttp.error.ParseException;
 import org.junit.Test;
 
 import static com.codegans.ttp.TestUtil.dictionary;
@@ -50,5 +51,10 @@ public class DictionaryBlockTest {
         int pos = dictionary("Jean", "Jeanette", "Jean-Claude").apply(TestUtil.string("123Jean-Claude Van Damme"), 3);
 
         assertEquals(14, pos);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testApply_ExpectedTextOffset_Negative() {
+        dictionary("Jean", "Jeanette", "Jean-Claude").apply(TestUtil.string("123Jean-Claude Van Damme"), 2);
     }
 }

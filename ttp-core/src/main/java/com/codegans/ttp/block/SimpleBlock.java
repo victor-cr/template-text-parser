@@ -55,7 +55,7 @@ public class SimpleBlock extends AbstractBlock {
 
         while (--j >= 0) {
             if (value.charAt(i++) != content.charAt(k++)) {
-                publish(new ErrorEvent(this, lines.getCurrentLineIndex(), i, new UnexpectedTokenParseException()));
+                publish(new ErrorEvent(this, lines.getCurrentLineIndex(), i, new UnexpectedTokenParseException(content.toString())));
                 return i;
             }
         }

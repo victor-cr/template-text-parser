@@ -65,25 +65,7 @@ public class EncodedLazyCharSequence implements CharSequence {
         if (value == null) {
             synchronized (content) {
                 if (value == null) {
-                    StringBuilder result = new StringBuilder(content.length() * 2);
-
-                    content.chars().forEach(ch -> {
-                        switch (ch) {
-                            case '\r':
-                                result.append("\\r");
-                                break;
-                            case '\n':
-                                result.append("\\n");
-                                break;
-                            case '\t':
-                                result.append("\\t");
-                                break;
-                            default:
-                                result.append((char) ch);
-                        }
-                    });
-
-                    value = result.toString();
+                    value = StringUtil.encodeSpecial(content);
                 }
             }
         }
