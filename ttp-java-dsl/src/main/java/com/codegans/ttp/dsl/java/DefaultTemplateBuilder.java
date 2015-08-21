@@ -51,6 +51,6 @@ public class DefaultTemplateBuilder implements TemplateBuilder {
 
     @Override
     public Block build() {
-        return new GroupBlock(1, 1, blocks);
+        return new GroupBlock(1, 1, blocks.toArray(new Block[blocks.size()]));
     }
 }

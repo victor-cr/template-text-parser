@@ -3,13 +3,11 @@ package com.codegans.ttp.block;
 import com.codegans.ttp.Block;
 import com.codegans.ttp.EventBus;
 import com.codegans.ttp.LineStream;
+import com.codegans.ttp.error.ParseException;
 import com.codegans.ttp.event.TraverseEndEvent;
 import com.codegans.ttp.event.TraverseStartEvent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * JavaDoc here
@@ -22,8 +20,10 @@ public class GroupBlock extends AbstractBlock {
     protected final int maxOccurs;
     protected final Collection<Block> blocks;
 
-    public GroupBlock(int minOccurs, int maxOccurs, Collection<Block> blocks) {
-        Objects.requireNonNull(blocks);
+    public GroupBlock(int minOccurs, int maxOccurs, Block... blocks) {
+        if (blocks == null || blocks.length == 0) {
+            throw new IllegalArgumentException("Inner blocks must be defined");
+        }
 
         if (maxOccurs < 0) {
             throw new IllegalArgumentException("Max occurrence cannot be negative: " + maxOccurs);
@@ -37,7 +37,7 @@ public class GroupBlock extends AbstractBlock {
             throw new IllegalArgumentException("Min occurrence is out of bounds. Expected " + minOccurs + " to be within range [0.." + maxOccurs + "]");
         }
 
-        this.blocks = Collections.unmodifiableCollection(new ArrayList<>(blocks));
+        this.blocks = Collections.unmodifiableCollection(new ArrayList<>(Arrays.asList(blocks)));
         this.minOccurs = minOccurs;
         this.maxOccurs = maxOccurs;
     }
@@ -58,6 +58,8 @@ public class GroupBlock extends AbstractBlock {
 
             try {
                 i = block.apply(eventBus, lines, i);
+            } catch (ParseException e) {
+
             } finally {
                 eventBus.publish(new TraverseEndEvent(this, lines.getCurrentLineIndex(), i, block));
             }

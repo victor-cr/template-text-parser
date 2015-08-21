@@ -2,11 +2,13 @@ package com.codegans.ttp;
 
 import com.codegans.ttp.block.CharDictionaryBlock;
 import com.codegans.ttp.block.DictionaryBlock;
+import com.codegans.ttp.block.GroupBlock;
 import com.codegans.ttp.block.SimpleBlock;
 import com.codegans.ttp.stream.ReaderLineStream;
 import com.codegans.ttp.stream.StringLineStream;
 
 import java.io.StringReader;
+import java.util.Arrays;
 
 /**
  * JavaDoc here
@@ -29,6 +31,10 @@ public abstract class TestUtil {
 
     public static Block dictionary(CharSequence... words) {
         return new DictionaryBlock(words);
+    }
+
+    public static Block group(Block... blocks) {
+        return new GroupBlock(1, 1, blocks);
     }
 
     public static LineStream string(String content) {
