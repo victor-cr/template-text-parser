@@ -1,4 +1,6 @@
-package com.codegans.ttp;
+package com.codegans.ttp.dsl.java;
+
+import com.codegans.ttp.Block;
 
 /**
  * JavaDoc here

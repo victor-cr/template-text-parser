@@ -1,17 +1,16 @@
 package com.codegans.ttp.block;
 
+import com.codegans.ttp.Block;
 import com.codegans.ttp.EventBus;
 import com.codegans.ttp.LineStream;
 import com.codegans.ttp.error.UnexpectedTokenParseException;
-import com.codegans.ttp.event.EmptyEvent;
-import com.codegans.ttp.event.ErrorEvent;
 import com.codegans.ttp.event.TextEvent;
-import com.codegans.ttp.misc.IntolerantEventBus;
-import com.codegans.ttp.misc.NullEventBus;
 import com.codegans.ttp.misc.StringUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -20,40 +19,42 @@ import java.util.stream.Collectors;
  * @author id967092
  * @since 12/08/2015 10:38
  */
-public class DictionaryBlock extends AbstractBlock {
+public class DictionaryBlock implements Block {
     private final Collection<char[]> dictionary;
 
     public DictionaryBlock(CharSequence... dictionary) {
-        this(new IntolerantEventBus(NullEventBus.INTSANCE), dictionary);
-    }
+        if (dictionary == null || dictionary.length == 0) {
+            throw new IllegalArgumentException("Dictionary cannot be undefined or empty");
+        }
 
-    public DictionaryBlock(EventBus eventBus, CharSequence... dictionary) {
-        super(eventBus);
+        Collection<String> strings = Arrays.stream(dictionary).map(CharSequence::toString).sorted().collect(Collectors.toList());
 
-        this.dictionary = Arrays.stream(dictionary).map(CharSequence::toString).map(String::toCharArray).collect(Collectors.toList());
+        String prevValue = null;
+        Iterator<String> i = strings.iterator();
+
+        for (String value = i.next(); i.hasNext(); prevValue = value, value = i.next()) {
+            if (value.equals(prevValue)) {
+                throw new IllegalArgumentException("Duplicated dictionary element: " + value);
+            }
+        }
+
+        this.dictionary = strings.stream().map(String::toCharArray).collect(Collectors.toList());
     }
 
     @Override
-    public int apply(LineStream lines, int offset) {
-        if (dictionary.isEmpty()) {
-            publish(new EmptyEvent(this, lines.getCurrentLineIndex(), offset));
-
-            return offset;
-        }
+    public int apply(EventBus eventBus, LineStream lines, int offset) {
+        Objects.requireNonNull(eventBus, "Event bus is undefined");
+        Objects.requireNonNull(lines, "Line stream is undefined");
 
         CharSequence content = lines.currentLine();
 
         int i = StringUtil.startsWithLongest(content, offset, dictionary);
 
         if (i == StringUtil.NOT_FOUND) {
-            publish(new ErrorEvent(this, lines.getCurrentLineIndex(), offset, new UnexpectedTokenParseException(
-                    dictionary.stream().map(Object::toString).collect(Collectors.joining("', '", "one of '", "'"))
-            )));
-
-            return offset;
+            throw new UnexpectedTokenParseException(lines.getCurrentLineIndex(), offset, dictionary.toString(), content.subSequence(offset, content.length()));
         }
 
-        publish(new TextEvent(this, lines.getCurrentLineIndex(), offset, content.subSequence(offset, i)));
+        eventBus.publish(new TextEvent(this, lines.getCurrentLineIndex(), offset, content.subSequence(offset, i)));
 
         return i;
     }

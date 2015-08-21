@@ -20,7 +20,7 @@ public abstract class TestUtil {
     }
 
     public static Block chars(char... chars) {
-        return new CharDictionaryBlock(chars);
+        return new CharDictionaryBlock(1, Integer.MAX_VALUE, chars);
     }
 
     public static Block dictionary(CharSequence... words) {

@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
  * @since 12/08/2015 12:14
  */
 public class IntolerantEventBus implements EventBus {
+    public static final IntolerantEventBus NULL = new IntolerantEventBus(NullEventBus.INTSANCE);
+
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final EventBus underline;

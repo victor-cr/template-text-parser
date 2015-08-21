@@ -26,14 +26,14 @@ public class SimpleTemplateITest {
     public void test() {
         EventBus eventBus = new IntolerantEventBus(NullEventBus.INTSANCE);
 
-        Block block = new GroupBlock(eventBus, Arrays.asList(
-                new SimpleBlock(eventBus, "text "),
-                new DecimalBlock(eventBus, true),
-                new SimpleBlock(eventBus, " rest")
+        Block block = new GroupBlock(1, 1, Arrays.asList(
+                new SimpleBlock("text "),
+                new DecimalBlock(1, 10, true),
+                new SimpleBlock(" rest")
         ));
 
         int expected = 20;
-        int actual = block.apply(TestUtil.string("text 0123456789 rest"), 0);
+        int actual = block.apply(eventBus, TestUtil.string("text 0123456789 rest"), 0);
 
         assertEquals(expected, actual);
     }

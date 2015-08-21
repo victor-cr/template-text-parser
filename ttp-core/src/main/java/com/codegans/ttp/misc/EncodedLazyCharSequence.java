@@ -58,7 +58,7 @@ public class EncodedLazyCharSequence implements CharSequence {
 
     @Override
     public String toString() {
-        return value();
+        return String.valueOf(value());
     }
 
     private String value() {

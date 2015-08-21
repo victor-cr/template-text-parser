@@ -19,8 +19,12 @@ public abstract class TestUtil {
         return new SimpleBlock(pattern);
     }
 
-    public static Block chars(char... chars) {
-        return new CharDictionaryBlock(chars);
+    public static Block charsOneOrMore(char... chars) {
+        return chars(1, Integer.MAX_VALUE, chars);
+    }
+
+    public static Block chars(int minOccurs, int maxOccurs, char... chars) {
+        return new CharDictionaryBlock(minOccurs, maxOccurs, chars);
     }
 
     public static Block dictionary(CharSequence... words) {

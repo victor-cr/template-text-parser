@@ -2,6 +2,7 @@ package com.codegans.ttp.block;
 
 import com.codegans.ttp.TestUtil;
 import com.codegans.ttp.error.ParseException;
+import com.codegans.ttp.misc.IntolerantEventBus;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -16,25 +17,25 @@ public class NewLineBlockTest {
 
     @Test(expected = NullPointerException.class)
     public void testApply_EventBusNull() {
-        new NewLineBlock(null);
+        new NewLineBlock().apply(null, TestUtil.string("\n\r"), 0);
     }
 
     @Test
     public void testApply_Empty() {
-        int pos = new NewLineBlock().apply(TestUtil.string("\n\r"), 0);
+        int pos = new NewLineBlock().apply(IntolerantEventBus.NULL, TestUtil.string("\n\r"), 0);
 
         assertEquals(0, pos);
     }
 
     @Test
     public void testApply_Offset() {
-        int pos = new NewLineBlock().apply(TestUtil.string("aaaaa\n\r"), 5);
+        int pos = new NewLineBlock().apply(IntolerantEventBus.NULL, TestUtil.string("aaaaa\n\r"), 5);
 
         assertEquals(0, pos);
     }
 
     @Test(expected = ParseException.class)
     public void testApply_NotFound() {
-        new NewLineBlock().apply(TestUtil.string("bla-bla-bla\r\n"), 0);
+        new NewLineBlock().apply(IntolerantEventBus.NULL, TestUtil.string("bla-bla-bla\r\n"), 0);
     }
 }

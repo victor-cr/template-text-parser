@@ -1,9 +1,5 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.EventBus;
-import com.codegans.ttp.misc.IntolerantEventBus;
-import com.codegans.ttp.misc.NullEventBus;
-
 /**
  * JavaDoc here
  *
@@ -15,12 +11,8 @@ public class DecimalBlock extends CharDictionaryBlock {
 
     private final boolean allowLeadingZeros;
 
-    public DecimalBlock(boolean allowLeadingZeros) {
-        this(new IntolerantEventBus(NullEventBus.INTSANCE), allowLeadingZeros);
-    }
-
-    public DecimalBlock(EventBus eventBus, boolean allowLeadingZeros) {
-        super(eventBus, NUMBERS);
+    public DecimalBlock(int minOccurs, int maxOccurs, boolean allowLeadingZeros) {
+        super(minOccurs, maxOccurs, NUMBERS);
 
         this.allowLeadingZeros = allowLeadingZeros;
     }

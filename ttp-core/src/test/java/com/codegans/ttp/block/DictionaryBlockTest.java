@@ -2,6 +2,7 @@ package com.codegans.ttp.block;
 
 import com.codegans.ttp.TestUtil;
 import com.codegans.ttp.error.ParseException;
+import com.codegans.ttp.misc.IntolerantEventBus;
 import org.junit.Test;
 
 import static com.codegans.ttp.TestUtil.dictionary;
@@ -15,46 +16,44 @@ import static org.junit.Assert.assertEquals;
  */
 public class DictionaryBlockTest {
 
-    @Test
-    public void testApply_DictionaryNull() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testDictionaryNull() {
+        dictionary((CharSequence[]) null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDictionaryEmpty() {
         dictionary();
     }
 
     @Test(expected = NullPointerException.class)
     public void testApply_EventBusNull() {
-        new CharDictionaryBlock(null, null);
-    }
-
-    @Test
-    public void testApply_Empty() {
-        int pos = dictionary().apply(TestUtil.string("test"), 0);
-
-        assertEquals(0, pos);
+        dictionary("aa").apply(null, TestUtil.string("test"), 0);
     }
 
     @Test
     public void testApply_Expected() {
-        int pos = dictionary("Dave", "Jan").apply(TestUtil.string("Dave Dupre"), 0);
+        int pos = dictionary("Dave", "Jan").apply(IntolerantEventBus.NULL, TestUtil.string("Dave Dupre"), 0);
 
         assertEquals(4, pos);
     }
 
     @Test
     public void testApply_ExpectedLongest() {
-        int pos = dictionary("Jan", "January", "Januarissimo").apply(TestUtil.string("January, 28"), 0);
+        int pos = dictionary("Jan", "January", "Januarissimo").apply(IntolerantEventBus.NULL, TestUtil.string("January, 28"), 0);
 
         assertEquals(7, pos);
     }
 
     @Test
     public void testApply_ExpectedTextOffset() {
-        int pos = dictionary("Jean", "Jeanette", "Jean-Claude").apply(TestUtil.string("123Jean-Claude Van Damme"), 3);
+        int pos = dictionary("Jean", "Jeanette", "Jean-Claude").apply(IntolerantEventBus.NULL, TestUtil.string("123Jean-Claude Van Damme"), 3);
 
         assertEquals(14, pos);
     }
 
     @Test(expected = ParseException.class)
     public void testApply_ExpectedTextOffset_Negative() {
-        dictionary("Jean", "Jeanette", "Jean-Claude").apply(TestUtil.string("123Jean-Claude Van Damme"), 2);
+        dictionary("Jean", "Jeanette", "Jean-Claude").apply(IntolerantEventBus.NULL, TestUtil.string("123Jean-Claude Van Damme"), 2);
     }
 }

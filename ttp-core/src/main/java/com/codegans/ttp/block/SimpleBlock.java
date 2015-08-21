@@ -1,14 +1,9 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.LineStream;
 import com.codegans.ttp.EventBus;
-import com.codegans.ttp.error.PrematureEndParseException;
+import com.codegans.ttp.LineStream;
 import com.codegans.ttp.error.UnexpectedTokenParseException;
-import com.codegans.ttp.event.EmptyEvent;
-import com.codegans.ttp.event.ErrorEvent;
 import com.codegans.ttp.event.TextEvent;
-import com.codegans.ttp.misc.IntolerantEventBus;
-import com.codegans.ttp.misc.NullEventBus;
 
 import java.util.Objects;
 
@@ -22,31 +17,24 @@ public class SimpleBlock extends AbstractBlock {
     private final CharSequence content;
 
     public SimpleBlock(CharSequence content) {
-        this(new IntolerantEventBus(NullEventBus.INTSANCE), content);
-    }
-
-    public SimpleBlock(EventBus eventBus, CharSequence content) {
-        super(eventBus);
-
-        Objects.requireNonNull(content, "Content must be defined");
+        if (content == null || content.length() == 0) {
+            throw new IllegalArgumentException("Content must be defined");
+        }
 
         this.content = content;
     }
 
     @Override
-    public int apply(LineStream lines, int offset) {
-        if (content.length() == 0) {
-            publish(new EmptyEvent(this, lines.getCurrentLineIndex(), offset));
-
-            return offset;
-        }
+    public int apply(EventBus eventBus, LineStream lines, int offset) {
+        Objects.requireNonNull(eventBus, "Event bus is undefined");
+        Objects.requireNonNull(lines, "Line stream is undefined");
 
         int len = content.length() + offset;
 
         CharSequence value = lines.currentLine();
 
         if (offset < 0 || value.length() < len) {
-            publish(new ErrorEvent(this, lines.getCurrentLineIndex(), len, new PrematureEndParseException()));
+            throw new UnexpectedTokenParseException(lines.getCurrentLineIndex(), offset, content, value.subSequence(offset, value.length()));
         }
 
         int i = offset;
@@ -55,12 +43,11 @@ public class SimpleBlock extends AbstractBlock {
 
         while (--j >= 0) {
             if (value.charAt(i++) != content.charAt(k++)) {
-                publish(new ErrorEvent(this, lines.getCurrentLineIndex(), i, new UnexpectedTokenParseException(content.toString())));
-                return i;
+                throw new UnexpectedTokenParseException(lines.getCurrentLineIndex(), i, content.subSequence(k - 1, content.length()), value.subSequence(i - 1, i + j));
             }
         }
 
-        publish(new TextEvent(this, lines.getCurrentLineIndex(), offset, content));
+        eventBus.publish(new TextEvent(this, lines.getCurrentLineIndex(), offset, content));
 
         return len;
     }

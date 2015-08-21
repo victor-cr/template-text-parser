@@ -1,8 +1,7 @@
 package com.codegans.ttp.integration;
 
 import com.codegans.ttp.Block;
-import com.codegans.ttp.misc.DefaultTemplateBuilder;
-import com.codegans.ttp.misc.NullEventBus;
+import com.codegans.ttp.dsl.java.DefaultTemplateBuilder;
 import org.junit.Test;
 
 /**
@@ -15,8 +14,6 @@ public class SimpleDslITest {
 
     @Test
     public void test() {
-        Block block = DefaultTemplateBuilder.get().bus(NullEventBus.INTSANCE)
-                .add(DefaultTemplateBuilder.text(""))
-                .build();
+        Block block = new DefaultTemplateBuilder().text("ahahaha").build();
     }
 }
