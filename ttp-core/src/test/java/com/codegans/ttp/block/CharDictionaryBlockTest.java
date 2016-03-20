@@ -1,12 +1,12 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.TestUtil;
-import com.codegans.ttp.misc.IntolerantEventBus;
-import org.junit.Test;
+import com.codegans.ttp.Result;
+import com.codegans.ttp.bbb.CharDictionaryBlock;
+import org.testng.annotations.Test;
 
-import static com.codegans.ttp.TestUtil.chars;
-import static com.codegans.ttp.TestUtil.charsOneOrMore;
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.expectThrows;
 
 /**
  * JavaDoc here
@@ -16,61 +16,108 @@ import static org.junit.Assert.assertEquals;
  */
 public class CharDictionaryBlockTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testApply_DictionaryNull() {
-        charsOneOrMore((char[]) null);
-    }
+    // Create tests
 
+    @Test
+    public void testCreate_MinNegative() {
+        IllegalArgumentException exception = expectThrows(IllegalArgumentException.class, () -> new CharDictionaryBlock(-1, 1, "a"));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testApply_DictionaryEmpty() {
-        charsOneOrMore();
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testApply_EventBusNull() {
-        charsOneOrMore('a').apply(null, TestUtil.string("test"), 0);
+        assertEquals(exception.getMessage(), "Min/max occurs has to be non-negative numbers");
     }
 
     @Test
-    public void testApply_ExpectedOne() {
-        int pos = charsOneOrMore('E', 't').apply(IntolerantEventBus.NULL, TestUtil.string("Example"), 0);
+    public void testCreate_MaxNegative() {
+        IllegalArgumentException exception = expectThrows(IllegalArgumentException.class, () -> new CharDictionaryBlock(1, -1, "a"));
 
-        assertEquals(1, pos);
+        assertEquals(exception.getMessage(), "Min/max occurs has to be non-negative numbers");
     }
 
     @Test
-    public void testApply_ExpectedAll() {
-        int pos = charsOneOrMore('E', 't').apply(IntolerantEventBus.NULL, TestUtil.string("Etc test"), 0);
+    public void testCreate_MaxZero() {
+        IllegalArgumentException exception = expectThrows(IllegalArgumentException.class, () -> new CharDictionaryBlock(1, 0, "a"));
 
-        assertEquals(2, pos);
+        assertEquals(exception.getMessage(), "Max occurs has to be positive");
     }
 
     @Test
-    public void testApply_ExpectedTextOffset() {
-        int pos = charsOneOrMore('E', 't').apply(IntolerantEventBus.NULL, TestUtil.string("123Expected text and something more"), 3);
+    public void testCreate_MinGreater() {
+        IllegalArgumentException exception = expectThrows(IllegalArgumentException.class, () -> new CharDictionaryBlock(2, 1, "a"));
 
-        assertEquals(4, pos);
+        assertEquals(exception.getMessage(), "Min occurs cannot be greater than max occurs");
     }
 
     @Test
-    public void testApply_ExpectedTextOffset_Many() {
-        int pos = charsOneOrMore('E', 't').apply(IntolerantEventBus.NULL, TestUtil.string("123EttttttEtEEEEEEEExpected text and something more"), 3);
+    public void testCreate_DictionaryNull() {
+        IllegalArgumentException exception = expectThrows(IllegalArgumentException.class, () -> new CharDictionaryBlock(1, 2, null));
 
-        assertEquals(20, pos);
+        assertEquals(exception.getMessage(), "Dictionary cannot be undefined or empty");
     }
 
     @Test
-    public void testApply_MinOccurs() {
-        int pos = chars(2, Integer.MAX_VALUE, '1', '2').apply(IntolerantEventBus.NULL, TestUtil.string("12345678"), 0);
+    public void testCreate_DictionaryEmpty() {
+        IllegalArgumentException exception = expectThrows(IllegalArgumentException.class, () -> new CharDictionaryBlock(1, 2, ""));
 
-        assertEquals(2, pos);
+        assertEquals(exception.getMessage(), "Dictionary cannot be undefined or empty");
     }
 
     @Test
-    public void testApply_MaxOccurs() {
-        int pos = chars(0, 3, '1', '2').apply(IntolerantEventBus.NULL, TestUtil.string("12121212"), 0);
+    public void testCreate_DictionaryNonUnique() {
+        IllegalArgumentException exception = expectThrows(IllegalArgumentException.class, () -> new CharDictionaryBlock(1, 2, "aba"));
 
-        assertEquals(3, pos);
+        assertEquals(exception.getMessage(), "Duplicated dictionary character: aba");
+    }
+
+    // Apply tests
+
+    @Test
+    public void testApply_MinFail() {
+        Result result = apply(2, 4, "abc", "as", 0, 0);
+
+        assertEquals(result.getParsed(), 1);
+        assertTrue(result.isFail());
+    }
+
+    @Test
+    public void testApply_MinSuccess() {
+        Result result = apply(2, 4, "abc", "acid", 0, 0);
+
+        assertEquals(result.getParsed(), 2);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    public void testApply_MaxSuccess() {
+        Result result = apply(2, 4, "abc", "abba ", 0, 0);
+
+        assertEquals(result.getParsed(), 4);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    public void testApply_MiddleSuccess() {
+        Result result = apply(2, 4, "abc", "account", 0, 0);
+
+        assertEquals(result.getParsed(), 3);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    public void testApply_Continue() {
+        Result result = apply(2, 4, "abc", "abc", 0, 0);
+
+        assertEquals(result.getParsed(), 3);
+        assertTrue(result.isContinue());
+    }
+
+    @Test
+    public void testApply_ContinueSuccess() {
+        Result result = apply(2, 4, "abc", "correct", 0, 3);
+
+        assertEquals(result.getParsed(), 1);
+        assertTrue(result.isSuccess());
+    }
+
+    private static Result apply(long min, long max, String dictionary, String buf, int off, long pos) {
+        return new CharDictionaryBlock(min, max, dictionary).apply(buf.toCharArray(), off, buf.length() - off, pos);
     }
 }

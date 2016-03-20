@@ -7,11 +7,26 @@ package com.codegans.ttp;
  * @since 01.08.2015 13:48
  */
 public enum Terminator {
+    /**
+     * MS Windows-like line separator
+     */
     CRLF("\r\n"),
+    /**
+     * RISC OS-like line separator
+     */
     LFCR("\n\r"),
+    /**
+     * Old MacOS-like line separator
+     */
     CR("\r"),
+    /**
+     * Unix-like line separator
+     */
     LF("\n"),
-    SYSTEM(System.getProperty("line.separator"));
+    /**
+     * Platform dependent line separator
+     */
+    SYSTEM(System.lineSeparator());
 
     private final String value;
 
@@ -29,6 +44,10 @@ public enum Terminator {
 
     public static Terminator[] any() {
         return new Terminator[]{CRLF, LFCR, CR, LF};
+    }
+
+    public static Terminator valueOf(int ordinal) {
+        return values()[ordinal];
     }
 
     public static Terminator find(CharSequence terminator) {
