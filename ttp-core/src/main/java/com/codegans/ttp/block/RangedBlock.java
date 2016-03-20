@@ -1,7 +1,11 @@
-package com.codegans.ttp.bbb;
+package com.codegans.ttp.block;
 
-import com.codegans.ttp.DynamicBlock;
+import com.codegans.ttp.Block;
+import com.codegans.ttp.GlobalContext;
 import com.codegans.ttp.Result;
+import com.codegans.ttp.context.LongPositionAwareLocalContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JavaDoc here
@@ -9,7 +13,8 @@ import com.codegans.ttp.Result;
  * @author Victor Polischuk
  * @since 19.03.2016 16:22
  */
-public abstract class RangedBlock implements DynamicBlock {
+public abstract class RangedBlock implements Block<LongPositionAwareLocalContext> {
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     private final long minOccurs;
     private final long maxOccurs;
 
@@ -28,32 +33,35 @@ public abstract class RangedBlock implements DynamicBlock {
 
         this.minOccurs = minOccurs;
         this.maxOccurs = maxOccurs;
+
+        log.debug("Created an instance: {}", this);
     }
 
     @Override
-    public Result apply(char[] buffer, int offset, int length, Result previous) {
+    public Result<LongPositionAwareLocalContext> apply(char[] buffer, int offset, int length, GlobalContext context) {
         int end = offset + length;
         int i = offset;
-        long j = previous.getParsed();
+        long j = context.get(this).position();
 
         while (i < end && j < minOccurs) {
             if (mismatched(buffer, i++, j++)) {
-                return previous.fail(i - offset - 1);
+                return Result.fail(new LongPositionAwareLocalContext(i - offset - 1, j - 1));
             }
         }
 
         while (i < end && j < maxOccurs) {
             if (mismatched(buffer, i++, j++)) {
-                return previous.ok(i - offset - 1);
+                return Result.ok(new LongPositionAwareLocalContext(i - offset - 1, j - 1));
             }
         }
 
         if (j == maxOccurs) {
-            return previous.ok(i - offset);
+            return Result.ok(new LongPositionAwareLocalContext(i - offset, j));
         }
 
-        return previous.more(i - offset);
+        return Result.more(new LongPositionAwareLocalContext(i - offset, j));
     }
 
     protected abstract boolean mismatched(char[] buffer, int i, long j);
+
 }

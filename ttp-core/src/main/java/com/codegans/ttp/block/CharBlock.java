@@ -1,4 +1,4 @@
-package com.codegans.ttp.bbb;
+package com.codegans.ttp.block;
 
 /**
  * JavaDoc here

@@ -1,8 +1,13 @@
 package com.codegans.ttp.block;
 
+import com.codegans.ttp.Block;
+import com.codegans.ttp.GlobalContext;
+import com.codegans.ttp.LocalContext;
 import com.codegans.ttp.Result;
-import com.codegans.ttp.bbb.TextBlock;
+import com.codegans.ttp.context.IntPositionAwareLocalContext;
 import org.testng.annotations.Test;
+
+import java.util.function.Supplier;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -38,7 +43,7 @@ public class TextBlockTest {
     public void testApply_Fail() {
         Result result = apply("abc", "as", 0, 0);
 
-        assertEquals(result.getParsed(), 1);
+        assertEquals(result.getProcessed(), 1);
         assertTrue(result.isFail());
     }
 
@@ -46,7 +51,7 @@ public class TextBlockTest {
     public void testApply_Success() {
         Result result = apply("abc", "abcd", 0, 0);
 
-        assertEquals(result.getParsed(), 3);
+        assertEquals(result.getProcessed(), 3);
         assertTrue(result.isSuccess());
     }
 
@@ -54,7 +59,7 @@ public class TextBlockTest {
     public void testApply_Continue() {
         Result result = apply("abc", "ab", 0, 0);
 
-        assertEquals(result.getParsed(), 2);
+        assertEquals(result.getProcessed(), 2);
         assertTrue(result.isContinue());
     }
 
@@ -62,11 +67,25 @@ public class TextBlockTest {
     public void testApply_ContinueSuccess() {
         Result result = apply("abc", "correct", 0, 2);
 
-        assertEquals(result.getParsed(), 1);
         assertTrue(result.isSuccess());
+        assertEquals(result.getProcessed(), 1);
     }
 
-    private static Result apply(String text, String buf, int off, long pos) {
-        return new TextBlock(text).apply(buf.toCharArray(), off, buf.length() - off, pos);
+    private static Result<? extends LocalContext> apply(String text, String buf, int off, int pos) {
+        return new TextBlock(text).apply(buf.toCharArray(), off, buf.length() - off, new GenericGlobalContext(() -> new IntPositionAwareLocalContext(0, pos)));
+    }
+
+    private static class GenericGlobalContext implements GlobalContext {
+        private final Supplier<LocalContext> supplier;
+
+        public GenericGlobalContext(Supplier<LocalContext> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T extends LocalContext> T get(Block<T> block) {
+            return (T) supplier.get();
+        }
     }
 }

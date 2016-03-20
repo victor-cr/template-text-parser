@@ -1,8 +1,13 @@
 package com.codegans.ttp.block;
 
+import com.codegans.ttp.Block;
+import com.codegans.ttp.GlobalContext;
+import com.codegans.ttp.LocalContext;
 import com.codegans.ttp.Result;
-import com.codegans.ttp.bbb.WildcardBlock;
+import com.codegans.ttp.context.SimpleLocalContext;
 import org.testng.annotations.Test;
+
+import java.util.function.Supplier;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -45,7 +50,7 @@ public class WildcardBlockTest {
     public void testApply_Success() {
         Result result = apply("\r\n", "Hello world!!!\n", 0, 0);
 
-        assertEquals(result.getParsed(), 14);
+        assertEquals(result.getProcessed(), 14);
         assertTrue(result.isSuccess());
     }
 
@@ -53,7 +58,7 @@ public class WildcardBlockTest {
     public void testApply_Continue() {
         Result result = apply("\r\n", "Hello wor", 0, 0);
 
-        assertEquals(result.getParsed(), 9);
+        assertEquals(result.getProcessed(), 9);
         assertTrue(result.isContinue());
     }
 
@@ -61,11 +66,26 @@ public class WildcardBlockTest {
     public void testApply_ContinueSuccess() {
         Result result = apply("\r\n", "ld!!!\n", 0, 9);
 
-        assertEquals(result.getParsed(), 5);
         assertTrue(result.isSuccess());
+        assertEquals(result.getProcessed(), 5);
     }
 
-    private static Result apply(String dictionary, String buf, int off, long pos) {
-        return new WildcardBlock(dictionary).apply(buf.toCharArray(), off, buf.length() - off, pos);
+    private static Result<? extends LocalContext> apply(String dictionary, String buf, int off, int pos) {
+        return new WildcardBlock(dictionary).apply(buf.toCharArray(), off, buf.length() - off, new GenericGlobalContext(() -> new SimpleLocalContext(pos)));
     }
+
+    private static class GenericGlobalContext implements GlobalContext {
+        private final Supplier<LocalContext> supplier;
+
+        public GenericGlobalContext(Supplier<LocalContext> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T extends LocalContext> T get(Block<T> block) {
+            return (T) supplier.get();
+        }
+    }
+
 }

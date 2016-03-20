@@ -9,7 +9,5 @@ package com.codegans.ttp;
 public interface TemplateInstance {
     TemplateInstance withErrorTolerance(boolean errorTolerance);
 
-    TemplateInstance withEventListener(EventBus eventListener);
-
     long apply();
 }

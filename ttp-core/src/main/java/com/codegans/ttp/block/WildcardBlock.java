@@ -1,7 +1,9 @@
-package com.codegans.ttp.bbb;
+package com.codegans.ttp.block;
 
-import com.codegans.ttp.DynamicBlock;
+import com.codegans.ttp.Block;
+import com.codegans.ttp.GlobalContext;
 import com.codegans.ttp.Result;
+import com.codegans.ttp.context.SimpleLocalContext;
 
 import java.util.Arrays;
 
@@ -11,7 +13,7 @@ import java.util.Arrays;
  * @author Victor Polischuk
  * @since 19.03.2016 13:04
  */
-public class WildcardBlock implements DynamicBlock {
+public class WildcardBlock implements Block<SimpleLocalContext> {
     private final int[] dictionary;
 
     public WildcardBlock(String stopAt) {
@@ -27,16 +29,16 @@ public class WildcardBlock implements DynamicBlock {
     }
 
     @Override
-    public Result apply(char[] buffer, int offset, int length, Result previous) {
+    public Result<SimpleLocalContext> apply(char[] buffer, int offset, int length, GlobalContext context) {
         int end = offset + length;
         int i = offset;
 
         while (i < end) {
             if (Arrays.binarySearch(dictionary, Character.codePointAt(buffer, i++)) >= 0) {
-                return previous.ok(i - offset - 1);
+                return Result.ok(new SimpleLocalContext(i - offset - 1));
             }
         }
 
-        return previous.more(i - offset);
+        return Result.more(new SimpleLocalContext(i - offset));
     }
 }

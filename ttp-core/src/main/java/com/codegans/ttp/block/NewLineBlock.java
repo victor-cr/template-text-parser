@@ -1,4 +1,4 @@
-package com.codegans.ttp.bbb;
+package com.codegans.ttp.block;
 
 /**
  * JavaDoc here
@@ -6,7 +6,7 @@ package com.codegans.ttp.bbb;
  * @author Victor Polischuk
  * @since 28.07.2015 22:12
  */
-public class NewLineBlock extends CharDictionaryBlock {
+public class NewLineBlock extends CharsBlock {
     public NewLineBlock() {
         this(1, Long.MAX_VALUE);
     }

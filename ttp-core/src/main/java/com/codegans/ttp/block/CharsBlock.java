@@ -1,4 +1,4 @@
-package com.codegans.ttp.bbb;
+package com.codegans.ttp.block;
 
 import java.util.Arrays;
 
@@ -8,10 +8,10 @@ import java.util.Arrays;
  * @author id967092
  * @since 12/08/2015 10:38
  */
-public class CharDictionaryBlock extends RangedBlock {
+public class CharsBlock extends RangedBlock {
     private final int[] dictionary;
 
-    public CharDictionaryBlock(long minOccurs, long maxOccurs, String dictionary) {
+    public CharsBlock(long minOccurs, long maxOccurs, String dictionary) {
         super(minOccurs, maxOccurs);
 
         if (dictionary == null || dictionary.length() == 0) {

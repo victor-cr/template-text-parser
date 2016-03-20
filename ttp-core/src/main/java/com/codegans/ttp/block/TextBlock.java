@@ -1,7 +1,9 @@
-package com.codegans.ttp.bbb;
+package com.codegans.ttp.block;
 
+import com.codegans.ttp.GlobalContext;
 import com.codegans.ttp.Result;
 import com.codegans.ttp.StaticBlock;
+import com.codegans.ttp.context.IntPositionAwareLocalContext;
 
 /**
  * JavaDoc here
@@ -9,7 +11,7 @@ import com.codegans.ttp.StaticBlock;
  * @author Victor Polischuk
  * @since 19.03.2016 13:04
  */
-public class TextBlock implements StaticBlock {
+public class TextBlock implements StaticBlock<IntPositionAwareLocalContext> {
     private final String text;
 
     public TextBlock(String text) {
@@ -21,23 +23,23 @@ public class TextBlock implements StaticBlock {
     }
 
     @Override
-    public Result apply(char[] buffer, int offset, int length, Result previous) {
+    public Result<IntPositionAwareLocalContext> apply(char[] buffer, int offset, int length, GlobalContext context) {
         int end = offset + length;
         int len = text.length();
         int i = offset;
-        int j = (int) previous.getParsed();
+        int j = context.get(this).position();
 
         while (i < end && j < len) {
             if (buffer[i++] != text.charAt(j++)) {
-                return previous.fail(i - offset - 1);
+                return Result.fail(new IntPositionAwareLocalContext(i - offset - 1, j - 1));
             }
         }
 
         if (j == len) {
-            return previous.ok(i - offset);
+            return Result.ok(new IntPositionAwareLocalContext(i - offset, j));
         }
 
-        return previous.more(i - offset);
+        return Result.more(new IntPositionAwareLocalContext(i - offset, j));
     }
 
     @Override

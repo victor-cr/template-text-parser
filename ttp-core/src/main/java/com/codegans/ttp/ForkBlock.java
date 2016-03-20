@@ -6,6 +6,6 @@ package com.codegans.ttp;
  * @author Victor Polischuk
  * @since 13.03.2016 19:07
  */
-public interface DynamicBlock {
-    Result apply(char[] buffer, int offset, int length, Result previous);
+public interface ForkBlock<T extends LocalContext> extends Block<T> {
+    int forks();
 }

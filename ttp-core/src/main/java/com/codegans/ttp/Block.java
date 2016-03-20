@@ -4,8 +4,8 @@ package com.codegans.ttp;
  * JavaDoc here
  *
  * @author Victor Polischuk
- * @since 25.07.2015 19:09
+ * @since 13.03.2016 19:07
  */
-public interface Block {
-    int apply(EventBus eventBus, LineStream lines, int offset);
+public interface Block<T extends LocalContext> {
+    Result<T> apply(char[] buffer, int offset, int length, GlobalContext context);
 }

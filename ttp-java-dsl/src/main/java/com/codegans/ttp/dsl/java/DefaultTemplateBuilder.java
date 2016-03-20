@@ -1,10 +1,8 @@
 package com.codegans.ttp.dsl.java;
 
 import com.codegans.ttp.Block;
-import com.codegans.ttp.block.DictionaryBlock;
-import com.codegans.ttp.block.GroupBlock;
-import com.codegans.ttp.bbb.NewLineBlock;
-import com.codegans.ttp.block.SimpleBlock;
+import com.codegans.ttp.block.NewLineBlock;
+import com.codegans.ttp.block.TextBlock;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -24,20 +22,14 @@ public class DefaultTemplateBuilder implements TemplateBuilder {
         return this;
     }
 
-    public DefaultTemplateBuilder text(CharSequence content) {
-        blocks.add(new SimpleBlock(content));
-
-        return this;
-    }
-
-    public DefaultTemplateBuilder words(CharSequence... dictionary) {
-        blocks.add(new DictionaryBlock(dictionary));
+    public DefaultTemplateBuilder text(String content) {
+        blocks.add(new TextBlock(content));
 
         return this;
     }
 
     @Override
     public Block build() {
-        return new GroupBlock(1, 1, blocks.toArray(new Block[blocks.size()]));
+        return null;
     }
 }

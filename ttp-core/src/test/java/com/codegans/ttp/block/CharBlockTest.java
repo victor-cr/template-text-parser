@@ -1,8 +1,13 @@
 package com.codegans.ttp.block;
 
+import com.codegans.ttp.Block;
+import com.codegans.ttp.GlobalContext;
+import com.codegans.ttp.LocalContext;
 import com.codegans.ttp.Result;
-import com.codegans.ttp.bbb.CharBlock;
+import com.codegans.ttp.context.LongPositionAwareLocalContext;
 import org.testng.annotations.Test;
+
+import java.util.function.Supplier;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -63,53 +68,67 @@ public class CharBlockTest {
 
     @Test
     public void testApply_MinFail() {
-        Result result = apply(2, 4, '=', "=a", 0, 0);
+        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "=a", 0, 0);
 
-        assertEquals(result.getParsed(), 1);
+        assertEquals(result.getProcessed(), 1);
         assertTrue(result.isFail());
     }
 
     @Test
     public void testApply_MinSuccess() {
-        Result result = apply(2, 4, '=', "==a", 0, 0);
+        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "==a", 0, 0);
 
-        assertEquals(result.getParsed(), 2);
+        assertEquals(result.getProcessed(), 2);
         assertTrue(result.isSuccess());
     }
 
     @Test
     public void testApply_MaxSuccess() {
-        Result result = apply(2, 4, '=', "====a", 0, 0);
+        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "====a", 0, 0);
 
-        assertEquals(result.getParsed(), 4);
+        assertEquals(result.getProcessed(), 4);
         assertTrue(result.isSuccess());
     }
 
     @Test
     public void testApply_MiddleSuccess() {
-        Result result = apply(2, 4, '=', "===a", 0, 0);
+        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "===a", 0, 0);
 
-        assertEquals(result.getParsed(), 3);
+        assertEquals(result.getProcessed(), 3);
         assertTrue(result.isSuccess());
     }
 
     @Test
     public void testApply_Continue() {
-        Result result = apply(2, 4, '=', "==", 0, 0);
+        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "==", 0, 0);
 
-        assertEquals(result.getParsed(), 2);
+        assertEquals(result.getProcessed(), 2);
         assertTrue(result.isContinue());
     }
 
     @Test
     public void testApply_ContinueSuccess() {
-        Result result = apply(2, 4, '=', "=a", 0, 3);
+        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "=a", 0, 3);
 
-        assertEquals(result.getParsed(), 1);
         assertTrue(result.isSuccess());
+        assertEquals(result.getProcessed(), 1);
     }
 
-    private static Result apply(long min, long max, int ch, String buf, int off, long pos) {
-        return new CharBlock(min, max, ch).apply(buf.toCharArray(), off, buf.length() - off, pos);
+    private static Result<LongPositionAwareLocalContext> apply(long min, long max, int ch, String buf, int off, long pos) {
+        return new CharBlock(min, max, ch).apply(buf.toCharArray(), off, buf.length() - off, new GenericGlobalContext(() -> new LongPositionAwareLocalContext(0, pos)));
+    }
+
+    private static class GenericGlobalContext implements GlobalContext {
+        private final Supplier<LocalContext> supplier;
+
+        public GenericGlobalContext(Supplier<LocalContext> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T extends LocalContext> T get(Block<T> block) {
+            return (T) supplier.get();
+        }
     }
 }
