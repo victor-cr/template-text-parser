@@ -1,13 +1,7 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.Block;
-import com.codegans.ttp.GlobalContext;
-import com.codegans.ttp.LocalContext;
 import com.codegans.ttp.Result;
-import com.codegans.ttp.context.LongPositionAwareLocalContext;
 import org.testng.annotations.Test;
-
-import java.util.function.Supplier;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -20,7 +14,7 @@ import static org.testng.Assert.expectThrows;
  * @author Victor Polischuk
  * @since 28.07.2015 22:32
  */
-public class CharBlockTest {
+public class CharBlockTest extends AbstractBlockTest {
 
     // Create tests
 
@@ -68,7 +62,7 @@ public class CharBlockTest {
 
     @Test
     public void testApply_MinFail() {
-        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "=a", 0, 0);
+        Result result = apply(new CharBlock(2, 4, '='), "=a", 0);
 
         assertEquals(result.getProcessed(), 1);
         assertTrue(result.isFail());
@@ -76,7 +70,7 @@ public class CharBlockTest {
 
     @Test
     public void testApply_MinSuccess() {
-        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "==a", 0, 0);
+        Result result = apply(new CharBlock(2, 4, '='), "==a", 0);
 
         assertEquals(result.getProcessed(), 2);
         assertTrue(result.isSuccess());
@@ -84,7 +78,7 @@ public class CharBlockTest {
 
     @Test
     public void testApply_MaxSuccess() {
-        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "====a", 0, 0);
+        Result result = apply(new CharBlock(2, 4, '='), "====a", 0);
 
         assertEquals(result.getProcessed(), 4);
         assertTrue(result.isSuccess());
@@ -92,7 +86,7 @@ public class CharBlockTest {
 
     @Test
     public void testApply_MiddleSuccess() {
-        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "===a", 0, 0);
+        Result result = apply(new CharBlock(2, 4, '='), "===a", 0);
 
         assertEquals(result.getProcessed(), 3);
         assertTrue(result.isSuccess());
@@ -100,35 +94,41 @@ public class CharBlockTest {
 
     @Test
     public void testApply_Continue() {
-        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "==", 0, 0);
+        Result result = apply(new CharBlock(2, 4, '='), "==", 0);
 
         assertEquals(result.getProcessed(), 2);
         assertTrue(result.isContinue());
     }
 
     @Test
-    public void testApply_ContinueSuccess() {
-        Result<LongPositionAwareLocalContext> result = apply(2, 4, '=', "=a", 0, 3);
+    public void testApply_End() {
+        Result result = apply(new CharBlock(2, 4, '='), "===", 3);
 
+        assertEquals(result.getProcessed(), 3);
         assertTrue(result.isSuccess());
-        assertEquals(result.getProcessed(), 1);
     }
 
-    private static Result<LongPositionAwareLocalContext> apply(long min, long max, int ch, String buf, int off, long pos) {
-        return new CharBlock(min, max, ch).apply(buf.toCharArray(), off, buf.length() - off, new GenericGlobalContext(() -> new LongPositionAwareLocalContext(0, pos)));
+    @Test
+    public void testApply_ContinueSuccess() {
+        Result result = apply(new CharBlock(2, 4, '='), "====a", 3);
+
+        assertEquals(result.getProcessed(), 4);
+        assertTrue(result.isSuccess());
     }
 
-    private static class GenericGlobalContext implements GlobalContext {
-        private final Supplier<LocalContext> supplier;
+    @Test
+    public void testApply_LongCodePointFail() {
+        Result result = apply(new CharBlock(2, 4, 0x10400), toString(0x10400), 0);
 
-        public GenericGlobalContext(Supplier<LocalContext> supplier) {
-            this.supplier = supplier;
-        }
+        assertEquals(result.getProcessed(), 2);
+        assertTrue(result.isFail());
+    }
 
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T extends LocalContext> T get(Block<T> block) {
-            return (T) supplier.get();
-        }
+    @Test
+    public void testApply_LongCodePointMin() {
+        Result result = apply(new CharBlock(2, 4, 0x10400), toString(0x10400, 0x10400, 'a'), 0);
+
+        assertEquals(result.getProcessed(), 4);
+        assertTrue(result.isSuccess());
     }
 }

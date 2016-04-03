@@ -1,11 +1,8 @@
 package com.codegans.ttp.block;
 
 import com.codegans.ttp.Block;
-import com.codegans.ttp.GlobalContext;
 import com.codegans.ttp.Result;
-import com.codegans.ttp.context.LongPositionAwareLocalContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.codegans.ttp.Stateful;
 
 /**
  * JavaDoc here
@@ -13,17 +10,18 @@ import org.slf4j.LoggerFactory;
  * @author Victor Polischuk
  * @since 19.03.2016 16:22
  */
-public abstract class RangedBlock implements Block<LongPositionAwareLocalContext> {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+public abstract class RangedBlock implements Block, Stateful {
     private final long minOccurs;
     private final long maxOccurs;
+    private long position;
+    private long occurs;
 
     public RangedBlock(long minOccurs, long maxOccurs) {
-        if (minOccurs < 0 || maxOccurs < 0) {
+        if (minOccurs < 0L || maxOccurs < 0L) {
             throw new IllegalArgumentException("Min/max occurs has to be non-negative numbers");
         }
 
-        if (maxOccurs == 0) {
+        if (maxOccurs == 0L) {
             throw new IllegalArgumentException("Max occurs has to be positive");
         }
 
@@ -33,35 +31,57 @@ public abstract class RangedBlock implements Block<LongPositionAwareLocalContext
 
         this.minOccurs = minOccurs;
         this.maxOccurs = maxOccurs;
-
-        log.debug("Created an instance: {}", this);
     }
 
     @Override
-    public Result<LongPositionAwareLocalContext> apply(char[] buffer, int offset, int length, GlobalContext context) {
-        int end = offset + length;
+    public Result apply(char[] buffer, int offset, int length) {
+        if (length == 0) {
+            return occurs >= minOccurs ? Result.ok(position) : Result.fail(position);
+        }
+
+        int limit = offset + length;
         int i = offset;
-        long j = context.get(this).position();
 
-        while (i < end && j < minOccurs) {
-            if (mismatched(buffer, i++, j++)) {
-                return Result.fail(new LongPositionAwareLocalContext(i - offset - 1, j - 1));
+        while (i < limit && occurs < minOccurs) {
+            if (mismatched(buffer, i, position, limit)) {
+                return Result.fail(position);
             }
+
+            int shift = Character.charCount(Character.codePointAt(buffer, i, limit));
+
+            i += shift;
+            position += shift;
+            occurs++;
         }
 
-        while (i < end && j < maxOccurs) {
-            if (mismatched(buffer, i++, j++)) {
-                return Result.ok(new LongPositionAwareLocalContext(i - offset - 1, j - 1));
+        if (occurs < minOccurs) {
+            return Result.fail(position);
+        }
+
+        while (i < limit && occurs < maxOccurs) {
+            if (mismatched(buffer, i, position, limit)) {
+                return Result.ok(position);
             }
+
+            int shift = Character.charCount(Character.codePointAt(buffer, i, limit));
+
+            i += shift;
+            position += shift;
+            occurs++;
         }
 
-        if (j == maxOccurs) {
-            return Result.ok(new LongPositionAwareLocalContext(i - offset, j));
+        if (occurs == maxOccurs) {
+            return Result.ok(position);
         }
 
-        return Result.more(new LongPositionAwareLocalContext(i - offset, j));
+        return Result.more(position);
     }
 
-    protected abstract boolean mismatched(char[] buffer, int i, long j);
+    @Override
+    public void reset() {
+        position = 0L;
+        occurs = 0L;
+    }
 
+    protected abstract boolean mismatched(char[] buffer, int i, long j, int limit);
 }

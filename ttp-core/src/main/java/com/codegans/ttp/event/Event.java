@@ -13,14 +13,13 @@ import java.util.EventObject;
  * @since 30.07.2015 20:23
  */
 public abstract class Event extends EventObject implements Cloneable {
-    protected final Logger log;
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     protected final long line;
     protected final int offset;
 
     public Event(Block source, long line, int offset) {
         super(source);
 
-        this.log = LoggerFactory.getLogger(getClass());
         this.line = line;
         this.offset = offset;
 

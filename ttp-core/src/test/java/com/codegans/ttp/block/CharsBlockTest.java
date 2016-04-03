@@ -1,13 +1,7 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.Block;
-import com.codegans.ttp.GlobalContext;
-import com.codegans.ttp.LocalContext;
 import com.codegans.ttp.Result;
-import com.codegans.ttp.context.LongPositionAwareLocalContext;
 import org.testng.annotations.Test;
-
-import java.util.function.Supplier;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -19,7 +13,7 @@ import static org.testng.Assert.expectThrows;
  * @author Victor Polischuk
  * @since 28.07.2015 22:32
  */
-public class CharsBlockTest {
+public class CharsBlockTest extends AbstractBlockTest {
 
     // Create tests
 
@@ -76,7 +70,7 @@ public class CharsBlockTest {
 
     @Test
     public void testApply_MinFail() {
-        Result result = apply(2, 4, "abc", "as", 0, 0);
+        Result result = apply(new CharsBlock(2, 4, "abc"), "as", 0);
 
         assertEquals(result.getProcessed(), 1);
         assertTrue(result.isFail());
@@ -84,7 +78,7 @@ public class CharsBlockTest {
 
     @Test
     public void testApply_MinSuccess() {
-        Result result = apply(2, 4, "abc", "acid", 0, 0);
+        Result result = apply(new CharsBlock(2, 4, "abc"), "acid", 0);
 
         assertEquals(result.getProcessed(), 2);
         assertTrue(result.isSuccess());
@@ -92,7 +86,7 @@ public class CharsBlockTest {
 
     @Test
     public void testApply_MaxSuccess() {
-        Result result = apply(2, 4, "abc", "abba ", 0, 0);
+        Result result = apply(new CharsBlock(2, 4, "abc"), "abba ", 0);
 
         assertEquals(result.getProcessed(), 4);
         assertTrue(result.isSuccess());
@@ -100,7 +94,7 @@ public class CharsBlockTest {
 
     @Test
     public void testApply_MiddleSuccess() {
-        Result result = apply(2, 4, "abc", "account", 0, 0);
+        Result result = apply(new CharsBlock(2, 4, "abc"), "account", 0);
 
         assertEquals(result.getProcessed(), 3);
         assertTrue(result.isSuccess());
@@ -108,7 +102,7 @@ public class CharsBlockTest {
 
     @Test
     public void testApply_Continue() {
-        Result result = apply(2, 4, "abc", "abc", 0, 0);
+        Result result = apply(new CharsBlock(2, 4, "abc"), "abc", 0);
 
         assertEquals(result.getProcessed(), 3);
         assertTrue(result.isContinue());
@@ -116,27 +110,9 @@ public class CharsBlockTest {
 
     @Test
     public void testApply_ContinueSuccess() {
-        Result result = apply(2, 4, "abc", "correct", 0, 3);
+        Result result = apply(new CharsBlock(2, 4, "_abc"), "abc_is_a_myth", 3);
 
+        assertEquals(result.getProcessed(), 4);
         assertTrue(result.isSuccess());
-        assertEquals(result.getProcessed(), 1);
-    }
-
-    private static Result apply(long min, long max, String dictonary, String buf, int off, long pos) {
-        return new CharsBlock(min, max, dictonary).apply(buf.toCharArray(), off, buf.length() - off, new GenericGlobalContext(() -> new LongPositionAwareLocalContext(0, pos)));
-    }
-
-    private static class GenericGlobalContext implements GlobalContext {
-        private final Supplier<LocalContext> supplier;
-
-        public GenericGlobalContext(Supplier<LocalContext> supplier) {
-            this.supplier = supplier;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T extends LocalContext> T get(Block<T> block) {
-            return (T) supplier.get();
-        }
     }
 }

@@ -1,9 +1,8 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.GlobalContext;
 import com.codegans.ttp.Result;
+import com.codegans.ttp.Stateful;
 import com.codegans.ttp.StaticBlock;
-import com.codegans.ttp.context.IntPositionAwareLocalContext;
 
 /**
  * JavaDoc here
@@ -11,39 +10,48 @@ import com.codegans.ttp.context.IntPositionAwareLocalContext;
  * @author Victor Polischuk
  * @since 19.03.2016 13:04
  */
-public class TextBlock implements StaticBlock<IntPositionAwareLocalContext> {
-    private final String text;
+public class TextBlock implements StaticBlock, Stateful {
+    private final char[] text;
+    private int position;
 
     public TextBlock(String text) {
         if (text == null || text.length() == 0) {
             throw new IllegalArgumentException("Text cannot be undefined or empty");
         }
 
-        this.text = text;
+        this.text = text.toCharArray();
     }
 
     @Override
-    public Result<IntPositionAwareLocalContext> apply(char[] buffer, int offset, int length, GlobalContext context) {
-        int end = offset + length;
-        int len = text.length();
-        int i = offset;
-        int j = context.get(this).position();
+    public Result apply(char[] buffer, int offset, int length) {
+        if (length == 0) {
+            return Result.fail(position);
+        }
 
-        while (i < end && j < len) {
-            if (buffer[i++] != text.charAt(j++)) {
-                return Result.fail(new IntPositionAwareLocalContext(i - offset - 1, j - 1));
+        int end = offset + length;
+        int len = text.length;
+        int i = offset;
+
+        while (i < end && position < len) {
+            if (buffer[i++] != text[position++]) {
+                return Result.fail(--position);
             }
         }
 
-        if (j == len) {
-            return Result.ok(new IntPositionAwareLocalContext(i - offset, j));
+        if (position == len) {
+            return Result.ok(position);
         }
 
-        return Result.more(new IntPositionAwareLocalContext(i - offset, j));
+        return Result.more(position);
     }
 
     @Override
     public long length() {
-        return text.length();
+        return text.length;
+    }
+
+    @Override
+    public void reset() {
+        position = 0;
     }
 }

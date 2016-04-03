@@ -26,7 +26,7 @@ public class CharsBlock extends RangedBlock {
     }
 
     @Override
-    protected boolean mismatched(char[] buffer, int i, long j) {
-        return Arrays.binarySearch(dictionary, Character.codePointAt(buffer, i)) < 0;
+    protected boolean mismatched(char[] buffer, int i, long j, int limit) {
+        return Arrays.binarySearch(dictionary, Character.codePointAt(buffer, i, limit)) < 0;
     }
 }

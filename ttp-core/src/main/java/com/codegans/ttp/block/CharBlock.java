@@ -24,7 +24,7 @@ public class CharBlock extends RangedBlock {
     }
 
     @Override
-    protected boolean mismatched(char[] buffer, int i, long j) {
-        return Character.codePointAt(buffer, i) != value;
+    protected boolean mismatched(char[] buffer, int i, long j, int limit) {
+        return Character.codePointAt(buffer, i, limit) != value;
     }
 }

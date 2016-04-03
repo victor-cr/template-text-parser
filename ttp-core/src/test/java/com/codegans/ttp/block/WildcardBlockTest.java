@@ -1,13 +1,7 @@
 package com.codegans.ttp.block;
 
-import com.codegans.ttp.Block;
-import com.codegans.ttp.GlobalContext;
-import com.codegans.ttp.LocalContext;
 import com.codegans.ttp.Result;
-import com.codegans.ttp.context.SimpleLocalContext;
 import org.testng.annotations.Test;
-
-import java.util.function.Supplier;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -70,22 +64,7 @@ public class WildcardBlockTest {
         assertEquals(result.getProcessed(), 5);
     }
 
-    private static Result<? extends LocalContext> apply(String dictionary, String buf, int off, int pos) {
-        return new WildcardBlock(dictionary).apply(buf.toCharArray(), off, buf.length() - off, new GenericGlobalContext(() -> new SimpleLocalContext(pos)));
+    private static Result apply(String dictionary, String buf, int off, int pos) {
+        return new WildcardBlock(dictionary).apply(buf.toCharArray(), off, buf.length() - off);
     }
-
-    private static class GenericGlobalContext implements GlobalContext {
-        private final Supplier<LocalContext> supplier;
-
-        public GenericGlobalContext(Supplier<LocalContext> supplier) {
-            this.supplier = supplier;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T extends LocalContext> T get(Block<T> block) {
-            return (T) supplier.get();
-        }
-    }
-
 }

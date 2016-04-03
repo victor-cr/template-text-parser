@@ -7,5 +7,5 @@ package com.codegans.ttp;
  * @since 20.03.2016 19:21
  */
 public interface GlobalContext {
-    <T extends LocalContext> T get(Block<T> block);
+    <T extends LocalContext> T get(Block block);
 }

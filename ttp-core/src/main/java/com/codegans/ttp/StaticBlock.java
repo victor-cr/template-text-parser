@@ -6,6 +6,6 @@ package com.codegans.ttp;
  * @author Victor Polischuk
  * @since 13.03.2016 19:07
  */
-public interface StaticBlock<T extends LocalContext> extends Block<T> {
+public interface StaticBlock extends Block {
     long length();
 }
