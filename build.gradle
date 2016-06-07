@@ -1,0 +1,23 @@
+allprojects {
+  group = 'com.codegans.text'
+  version = '0.1-SNAPSHOT'
+}
+
+subprojects {
+  apply plugin: 'java'
+
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    compile "org.slf4j:slf4j-api:1.7.20"
+    testCompile "org.testng:testng:6.9.10"
+    testCompile "ch.qos.logback:logback-classic:1.1.7"
+  }
+
+  test.useTestNG()
+}

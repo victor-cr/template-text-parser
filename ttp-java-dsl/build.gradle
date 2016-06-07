@@ -1,0 +1,5 @@
+description = "Java DSL module of template text parser"
+
+dependencies {
+  compile project(":ttp-api")
+}

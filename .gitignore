@@ -2,6 +2,9 @@
 ## Folder
 ##
 target/
+build/
+.gradle/
+.idea/
 
 ##
 ## Files

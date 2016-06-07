@@ -1,0 +1,8 @@
+rootProject.name = 'ttp-parent'
+include ':ttp-api'
+include ':ttp-engine-nfa'
+include ':ttp-java-dsl'
+
+project(':ttp-api').projectDir = "$rootDir/ttp-api" as File
+project(':ttp-engine-nfa').projectDir = "$rootDir/ttp-engine-nfa" as File
+project(':ttp-java-dsl').projectDir = "$rootDir/ttp-java-dsl" as File
