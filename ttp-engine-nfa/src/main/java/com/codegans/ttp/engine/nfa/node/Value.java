@@ -1,6 +1,6 @@
 package com.codegans.ttp.engine.nfa.node;
 
-import com.codegans.ttp.Block;
+import com.codegans.ttp.block.Block;
 
 /**
  * JavaDoc here

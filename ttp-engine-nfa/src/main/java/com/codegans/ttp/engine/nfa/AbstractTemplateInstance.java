@@ -1,7 +1,7 @@
 package com.codegans.ttp.engine.nfa;
 
 import com.codegans.ttp.BlockListener;
-import com.codegans.ttp.TemplateInstance;
+import com.codegans.ttp.template.TemplateInstance;
 import com.codegans.ttp.error.IoParseException;
 
 import java.io.IOException;

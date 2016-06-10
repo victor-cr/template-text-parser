@@ -1,8 +1,10 @@
-rootProject.name = 'ttp-parent'
-include ':ttp-api'
-include ':ttp-engine-nfa'
-include ':ttp-java-dsl'
+rootProject.name = "ttp-parent"
+include ":ttp-spi"
+include ":ttp-engine-nfa"
+include ":ttp-java-dsl"
+include ":ttp-test"
 
-project(':ttp-api').projectDir = "$rootDir/ttp-api" as File
-project(':ttp-engine-nfa').projectDir = "$rootDir/ttp-engine-nfa" as File
-project(':ttp-java-dsl').projectDir = "$rootDir/ttp-java-dsl" as File
+//project(":ttp-api").projectDir = "$rootDir/ttp-api" as File
+//project(":ttp-engine-nfa").projectDir = "$rootDir/ttp-engine-nfa" as File
+//project(":ttp-java-dsl").projectDir = "$rootDir/ttp-java-dsl" as File
+//project(":ttp-test").projectDir = "$rootDir/ttp-test" as File

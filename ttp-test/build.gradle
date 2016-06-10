@@ -1,0 +1,5 @@
+description = "Base test module of template text parser"
+
+dependencies {
+  compile project(":ttp-spi")
+}

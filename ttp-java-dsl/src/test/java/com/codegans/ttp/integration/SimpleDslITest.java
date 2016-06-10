@@ -1,6 +1,6 @@
 package com.codegans.ttp.integration;
 
-import com.codegans.ttp.Block;
+import com.codegans.ttp.block.Block;
 import com.codegans.ttp.dsl.java.DefaultTemplateBuilder;
 import org.testng.annotations.Test;
 

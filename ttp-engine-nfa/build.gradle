@@ -1,5 +1,6 @@
-description = "Core module of template text parser"
+description = "NFA engine implementation of template text parser"
 
 dependencies {
-  compile project(":ttp-api")
+  compile project(":ttp-spi")
+  testCompile project(":ttp-test")
 }

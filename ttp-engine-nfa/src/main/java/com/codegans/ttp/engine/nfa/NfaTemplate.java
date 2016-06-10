@@ -1,8 +1,8 @@
 package com.codegans.ttp.engine.nfa;
 
-import com.codegans.ttp.Block;
-import com.codegans.ttp.Template;
-import com.codegans.ttp.TemplateInstance;
+import com.codegans.ttp.block.Block;
+import com.codegans.ttp.template.Template;
+import com.codegans.ttp.template.TemplateInstance;
 import com.codegans.ttp.engine.nfa.node.Node;
 import com.codegans.ttp.engine.nfa.node.Start;
 

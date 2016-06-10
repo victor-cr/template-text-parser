@@ -1,6 +1,6 @@
 package com.codegans.ttp.engine.nfa;
 
-import com.codegans.ttp.TemplateInstance;
+import com.codegans.ttp.template.TemplateInstance;
 
 import java.io.Reader;
 import java.util.function.Supplier;
