@@ -1,5 +1,8 @@
 package com.codegans.ttp.pattern;
 
+import com.codegans.ttp.template.ConjunctionTemplateFactory;
+import com.codegans.ttp.template.DisjunctionTemplateFactory;
+import com.codegans.ttp.template.SymbolTemplateFactory;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -13,7 +16,7 @@ import static org.testng.Assert.assertEquals;
 public class TemplateFactoryTest {
     @Test
     public void testCompile_ConjunctionBound() {
-        TemplateInstance machine = ConjunctionTemplateFactory.create(
+        ProtoNode machine = ConjunctionTemplateFactory.create(
                 SymbolTemplateFactory.create('a').max(3),
                 SymbolTemplateFactory.create('b').max(3)
         ).compile();
@@ -23,7 +26,7 @@ public class TemplateFactoryTest {
 
     @Test
     public void testCompile_ConjunctionUnbound() {
-        TemplateInstance machine = ConjunctionTemplateFactory.create(
+        ProtoNode machine = ConjunctionTemplateFactory.create(
                 SymbolTemplateFactory.create('a').unbound(),
                 SymbolTemplateFactory.create('b').unbound().min(1),
                 SymbolTemplateFactory.create('c').unbound().max(1),
@@ -35,7 +38,7 @@ public class TemplateFactoryTest {
 
     @Test
     public void testCompile_ConjunctionInner() {
-        TemplateInstance machine = ConjunctionTemplateFactory.create(
+        ProtoNode machine = ConjunctionTemplateFactory.create(
                 ConjunctionTemplateFactory.create(
                         SymbolTemplateFactory.create('a').unbound(),
                         SymbolTemplateFactory.create('b').unbound().min(1)
@@ -48,7 +51,7 @@ public class TemplateFactoryTest {
 
     @Test
     public void testCompile_DisjunctionBound() {
-        TemplateInstance machine = DisjunctionTemplateFactory.create(
+        ProtoNode machine = DisjunctionTemplateFactory.create(
                 SymbolTemplateFactory.create('a').max(3),
                 SymbolTemplateFactory.create('b').max(3)
         ).compile();
@@ -58,7 +61,7 @@ public class TemplateFactoryTest {
 
     @Test
     public void testCompile_DisjunctionUnbound() {
-        TemplateInstance machine = DisjunctionTemplateFactory.create(
+        ProtoNode machine = DisjunctionTemplateFactory.create(
                 SymbolTemplateFactory.create('a').unbound().min(0),
                 SymbolTemplateFactory.create('b').unbound().min(1),
                 SymbolTemplateFactory.create('c').unbound().max(1),

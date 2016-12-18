@@ -1,9 +1,9 @@
 package com.codegans.ttp.dsl.java;
 
-import com.codegans.ttp.pattern.ConjunctionTemplateFactory;
-import com.codegans.ttp.pattern.QuantifiedTemplateFactory;
-import com.codegans.ttp.pattern.SymbolTemplateFactory;
-import com.codegans.ttp.pattern.TemplateFactory;
+import com.codegans.ttp.template.ConjunctionTemplateFactory;
+import com.codegans.ttp.template.QuantifiedTemplateFactory;
+import com.codegans.ttp.template.SymbolTemplateFactory;
+import com.codegans.ttp.template.TemplateFactory;
 
 import java.util.ArrayList;
 import java.util.List;

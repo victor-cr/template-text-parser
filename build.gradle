@@ -14,9 +14,9 @@ subprojects {
   }
 
   dependencies {
-    compile "org.slf4j:slf4j-api:1.7.20"
-    testCompile "org.testng:testng:6.9.10"
-    testCompile "ch.qos.logback:logback-classic:1.1.7"
+    compile "org.slf4j:slf4j-api:1.7.22"
+    testCompile "org.testng:testng:6.9.13.6"
+    testCompile "ch.qos.logback:logback-classic:1.1.8"
   }
 
   test.useTestNG()

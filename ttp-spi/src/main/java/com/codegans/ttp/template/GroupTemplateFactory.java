@@ -1,4 +1,4 @@
-package com.codegans.ttp.pattern;
+package com.codegans.ttp.template;
 
 /**
  * JavaDoc here

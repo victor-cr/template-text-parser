@@ -1,4 +1,6 @@
-package com.codegans.ttp.pattern;
+package com.codegans.ttp.template;
+
+import com.codegans.ttp.pattern.ProtoNode;
 
 /**
  * JavaDoc here
@@ -7,7 +9,7 @@ package com.codegans.ttp.pattern;
  * @since 17.12.2016 9:33
  */
 public interface TemplateFactory {
-    TemplateInstance compile();
+    ProtoNode compile();
 
     TemplateFactory min(long occurrences);
 

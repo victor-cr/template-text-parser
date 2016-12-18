@@ -1,8 +1,10 @@
 rootProject.name = "ttp-parent"
+
 include ":ttp-spi"
 include ":ttp-engine-nfa"
 include ":ttp-java-dsl"
 include ":ttp-test"
+include ":ttp-performance"
 
 //project(":ttp-api").projectDir = "$rootDir/ttp-api" as File
 //project(":ttp-engine-nfa").projectDir = "$rootDir/ttp-engine-nfa" as File

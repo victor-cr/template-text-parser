@@ -1,0 +1,11 @@
+description = "Module for performance testing"
+
+def jmhVersion = "1.17.3"
+
+dependencies {
+  compile project(":ttp-spi")
+  compile project(":ttp-java-dsl")
+  compile project(":ttp-engine-nfa")
+  compile "org.openjdk.jmh:jmh-core:$jmhVersion"
+  compileOnly "org.openjdk.jmh:jmh-generator-annprocess:$jmhVersion"
+}
